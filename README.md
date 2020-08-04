@@ -19,8 +19,8 @@ This bot is began its life as some code stuck together from DiscordJS Guide, Sit
 1. Clone repo
 2. Edit json files in ./config to include your own credentials
 3. Edit discommands/secret.json to include your own secret info
-3. Run `node index.js`
-4. Interact with your Discord bot via your web browser
+3. Inside ./bots choose which bot to launch using `node`. Example: `node discord-botster.js` to launch the Discord bot.
+4. Interact with your bot via Discord, Twitch, and/or IRC depending on how you are using it.
 
 Note: You'll want to add a fortune, insult, or 8 ball prediction to generate the table to start collecting those things. The easiest way is just to run the insultadd command, but you can also manually create a sqlite db and import some data into it.
 
