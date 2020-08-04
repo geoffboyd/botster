@@ -22,7 +22,7 @@ This bot is began its life as some code stuck together from DiscordJS Guide, Sit
 3. Inside ./bots choose which bot to launch using `node`. Example: `node discord-botster.js` to launch the Discord bot.
 4. Interact with your bot via Discord, Twitch, and/or IRC depending on how you are using it.
 
-Note: You'll want to add a fortune, insult, or 8 ball prediction to generate the table to start collecting those things. The easiest way is just to run the insultadd command, but you can also manually create a sqlite db and import some data into it.
+Note in case you choose to get rid of the existing database. You'll want to add a fortune, insult, or 8 ball prediction to generate the table to start collecting those things. The easiest way is just to run the insultadd command, but you can also manually create a sqlite db and import some data into it.
 
 ## License
 All glory to Hypnotoad. I claim no license over any of this.

@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token, owner } = require('../config/discord.json');
 const SQLite = require("better-sqlite3");
-const sql = new SQLite('../scores.sqlite');
+const sql = new SQLite('../userinputs.sqlite');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
