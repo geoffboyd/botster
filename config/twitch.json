@@ -1,0 +1,6 @@
+{
+    "username": "TWITCH-BOT-USERNAME",
+    "password": "TWITCH-BOT-OAUTH-TOKEN",
+    "channels": ["channel1","channel2"],
+    "prefix": "&"
+}

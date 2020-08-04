@@ -1,0 +1,17 @@
+{
+  "name": "twitchbot",
+  "version": "0.1.0",
+  "description": "botster for Twitch!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.1.0",
+    "discord.js": "^12.2.0",
+    "irc": "^0.5.2",
+    "tmi.js": "^1.5.0"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "channels": ["#Channel1", "#Channel2"],
+  "server": "irc.irchighway.net",
+  "botName": "NAME-OF-BOT",
+  "prefix": "."
+}
