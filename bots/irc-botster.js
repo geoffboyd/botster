@@ -4,19 +4,42 @@ const { channels, server, botName, prefix } = require('../config/irc.json');
 const bot = new irc.Client(server, botName, {channels: channels});
 const SQLite = require("better-sqlite3");
 const db = new SQLite('../userinputs.sqlite');
+var args = [];
+
+// Markov generator
+var MarkovChain = require('markovchain'), 
+  fs = require('fs'), 
+  wordSalad = new MarkovChain(fs.readFileSync('./ircHistory.txt', 'utf8'))
 
 // Listen for joins
 bot.addListener("join", function(channel, who) {
   // Welcome them in!
-  bot.say(channel, who + ", welcome to the party!");
+  bot.say(channel, `Hi, ${who}!`);
 });
 
 // Listen for messages now
 bot.addListener("message", function(from, to, text, message) {
+  if (from !== 'botster' || from !== 'Susie') {
+    fs.appendFile('ircHistory.txt', `\n${text}`, function (err) {
+      if (err) throw err;
+    });
+  }
+  args = text.slice(prefix.length).trim().split(/ +/);
+  const channel = message.args[0];
+  var randomFuckery = Math.ceil(Math.random()*20);
+  if ((text.toLowerCase().includes('botster') && from !== 'botster' && from !== 'Susie') || (randomFuckery === 10))
+    {
+      if (args[0]) {
+        var startWord = args[Math.floor(Math.random(args.length))];
+        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+      } else {
+        var startWord = from;
+        var phraseLength = Math.ceil(Math.random()*10);
+      }
+    bot.say(channel, wordSalad.start(startWord).end(phraseLength).process());
+    }
   if (text.startsWith(prefix)) {
-    const args = text.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
-    const channel = message.args[0];
 
     // Now do some stuff!
     switch (commandName) {
@@ -59,6 +82,10 @@ bot.addListener("message", function(from, to, text, message) {
 
       case 'insultadd':
         randAdd(channel, text, 'insult', from, 'insult');
+        break;
+
+      case 'chat':
+        chatBot(channel, text);
         break;
     }
   }
@@ -134,4 +161,21 @@ function randAdd(channel, text, type, from, response) {
     } else {
       bot.say(channel, `You need to tell me the ${response} to add!`);
     }
+}
+
+
+function chatBot(channel, seed) {
+  (async function() {
+      try {
+        var resp = await deepai.callStandardApi("text-generator", {
+                text: seed,
+        });
+      }
+      catch(err) {
+        console.log(err);
+      }
+      var sentence = resp['output'].split['\n'];
+      console.log(sentence[0]);
+      bot.say(channel, sentence[0]);
+  })()
 }

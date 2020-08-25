@@ -4,6 +4,10 @@ const SQLite = require("better-sqlite3");
 const db = new SQLite('../userinputs.sqlite');
 const { username, password, channels, prefix } = require('../config/twitch.json');
 
+// Markov generator
+var MarkovChain = require('markovchain'), 
+  wordSalad = new MarkovChain(fs.readFileSync('./twitchHistory.txt', 'utf8'))
+
 // Define configuration options
 const opts = {
   identity: {
@@ -24,13 +28,30 @@ client.connect();
 
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
+  var randomFuckery = Math.ceil(Math.random()*20);
   if (self) { return; } // Ignore messages from the bot
-  if (!msg.startsWith(prefix)) {return;} // Ignore messages without the right prefix
-
+  if (!msg.startsWith(prefix) && randomFuckery !== 10 && !msg.includes('botster')) {return;} // Ignore messages without the right prefix
   // Remove whitespace from chat message
   const args = msg.slice(prefix.length).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
   var from = context['display-name'];
+  if (from !== self) {
+    fs.appendFile('twitchHistory.txt', `\n${msg}`, function (err) {
+      if (err) throw err;
+    });
+  }
+
+// Sometimes random fun happens
+  if (randomFuckery == 10 || msg.includes('botster')) {
+      if (args[0]) {
+        var startWord = args[Math.floor(Math.random(args.length))];
+        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+      } else {
+        var startWord = target;
+        var phraseLength = Math.ceil(Math.random()*10);
+      }
+    client.say(target, wordSalad.start(startWord).end(phraseLength).process());
+  } 
 
   // Now do some stuff!
   switch (commandName) {
