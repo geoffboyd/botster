@@ -30,28 +30,37 @@ client.connect();
 function onMessageHandler (target, context, msg, self) {
   var randomFuckery = Math.ceil(Math.random()*20);
   if (self) { return; } // Ignore messages from the bot
-  if (!msg.startsWith(prefix) && randomFuckery !== 10 && !msg.includes('botster')) {return;} // Ignore messages without the right prefix
+  if (!msg.startsWith(prefix) && randomFuckery !== 10 && !msg.toLowerCase().includes('botster')) {return;} // Ignore messages without the right prefix
   // Remove whitespace from chat message
-  const args = msg.slice(prefix.length).trim().split(/ +/);
-  const commandName = args.shift().toLowerCase();
+  var words = msg.trim().split(/ +/);
+  if (words[0].startsWith(prefix)) {words[0] = words[0].slice(1, words[0].length);}
+  const commandName = words[0].toLowerCase();
+  var args = words;
+  args.shift();
   var from = context['display-name'];
   if (from !== self) {
     fs.appendFile('twitchHistory.txt', `\n${msg}`, function (err) {
       if (err) throw err;
     });
   }
-
-// Sometimes random fun happens
-  if (randomFuckery == 10 || msg.includes('botster')) {
-      if (args[0]) {
-        var startWord = args[Math.floor(Math.random(args.length))];
-        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
-      } else {
-        var startWord = target;
-        var phraseLength = Math.ceil(Math.random()*10);
-      }
-    client.say(target, wordSalad.start(startWord).end(phraseLength).process());
-  } 
+  if (randomFuckery == 10 || msg.toLowerCase().includes('botster')) {
+    if (words[1]) {
+      var startWord = words[Math.floor(Math.random()*words.length)];
+      var phraseLength = Math.floor(Math.random()*((words.length + 10)*2));
+    } else {
+      var startWord = target;
+      var phraseLength = Math.ceil(Math.random()*10);
+    }
+    var phrase = wordSalad.start(startWord).end(phraseLength).process();
+    var firstLetter = phrase.slice(0, 1);
+    firstLetter = firstLetter.toUpperCase();
+    var restOfPhrase = phrase.slice(1, phrase.length);
+    phrase = firstLetter + restOfPhrase;
+    while (phrase.endsWith('?') || phrase.endsWith('.') || phrase.endsWith('!') || phrase.endsWith('"') || phrase.endsWith(',')) {
+      phrase.slice(0, -1)
+    }
+    client.say(target, phrase+'.');
+  } // Sometimes random fun happens
 
   // Now do some stuff!
   switch (commandName) {

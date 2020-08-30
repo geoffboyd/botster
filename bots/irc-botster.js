@@ -9,7 +9,11 @@ var args = [];
 // Markov generator
 var MarkovChain = require('markovchain'), 
   fs = require('fs'), 
-  wordSalad = new MarkovChain(fs.readFileSync('./ircHistory.txt', 'utf8'))
+  wordSalad = new MarkovChain(fs.readFileSync('./ircNoHHG.txt', 'utf8'))
+
+var stopAfterSentence = function(sentence) {
+  return sentence.split(". ").length > 1
+}
 
 // Listen for joins
 bot.addListener("join", function(channel, who) {
@@ -19,27 +23,34 @@ bot.addListener("join", function(channel, who) {
 
 // Listen for messages now
 bot.addListener("message", function(from, to, text, message) {
-  if (from !== 'botster' || from !== 'Susie') {
+  if (from !== 'botster' && from !== 'Susie' && !text.startsWith(prefix)) {
     fs.appendFile('ircHistory.txt', `\n${text}`, function (err) {
       if (err) throw err;
     });
   }
-  args = text.slice(prefix.length).trim().split(/ +/);
+  args = text.trim().split(/ +/);
   const channel = message.args[0];
   var randomFuckery = Math.ceil(Math.random()*20);
-  if ((text.toLowerCase().includes('botster') && from !== 'botster' && from !== 'Susie') || (randomFuckery === 10))
-    {
-      if (args[0]) {
-        var startWord = args[Math.floor(Math.random(args.length))];
-        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
-      } else {
-        var startWord = from;
-        var phraseLength = Math.ceil(Math.random()*10);
-      }
-    bot.say(channel, wordSalad.start(startWord).end(phraseLength).process());
+  if ((text.toLowerCase().includes('botster') && from !== 'botster' && from !== 'Susie') || (randomFuckery === 10)) {
+    if (args[1]) {
+      var startWord = args[Math.floor(Math.random()*args.length)];
+      var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+    } else {
+      var startWord = from;
+      var phraseLength = Math.ceil(Math.random()*10);
     }
-  if (text.startsWith(prefix)) {
-    const commandName = args.shift().toLowerCase();
+    var phrase = wordSalad.start(startWord).end(phraseLength).process();
+    var firstLetter = phrase.slice(0, 1);
+    firstLetter = firstLetter.toUpperCase();
+    var restOfPhrase = phrase.slice(1, phrase.length);
+    phrase = firstLetter + restOfPhrase;
+    while (phrase.endsWith('?') || phrase.endsWith('.') || phrase.endsWith('!') || phrase.endsWith('"') || phrase.endsWith(',')) {
+      phrase = phrase.slice(0, -1);
+    }
+    bot.say(channel, phrase+'.');
+  } else if (args[0].startsWith(prefix)) {
+    args[0] = args[0].slice(1, args[0].length);
+    const commandName = args[0].toLowerCase();
 
     // Now do some stuff!
     switch (commandName) {
@@ -82,10 +93,6 @@ bot.addListener("message", function(from, to, text, message) {
 
       case 'insultadd':
         randAdd(channel, text, 'insult', from, 'insult');
-        break;
-
-      case 'chat':
-        chatBot(channel, text);
         break;
     }
   }
@@ -161,21 +168,4 @@ function randAdd(channel, text, type, from, response) {
     } else {
       bot.say(channel, `You need to tell me the ${response} to add!`);
     }
-}
-
-
-function chatBot(channel, seed) {
-  (async function() {
-      try {
-        var resp = await deepai.callStandardApi("text-generator", {
-                text: seed,
-        });
-      }
-      catch(err) {
-        console.log(err);
-      }
-      var sentence = resp['output'].split['\n'];
-      console.log(sentence[0]);
-      bot.say(channel, sentence[0]);
-  })()
 }

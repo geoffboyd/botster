@@ -8,7 +8,7 @@ client.commands = new Discord.Collection();
 
 // Markov generator
 var MarkovChain = require('markovchain'),
-  wordSalad = new MarkovChain(fs.readFileSync('./ircHistory.txt', 'utf8'))
+  wordSalad = new MarkovChain(fs.readFileSync('./discordHistory.txt', 'utf8'))
 
 const commandFiles = fs.readdirSync('../discommands').filter(file => file.endsWith('.js'));
 
@@ -35,7 +35,7 @@ client.once('ready', () => {
 });
 
 client.on('message', message => {
- 	var words = message['content'].slice(prefix.length).trim().split(/ +/);
+ 	var words = message['content'].trim().split(/ +/);
 	var randomFuckery = Math.ceil(Math.random()*20);
 	if (!message.author.bot) {
 		fs.appendFile('discordHistory.txt', `\n${message['content']}`, function (err) {
@@ -47,15 +47,22 @@ client.on('message', message => {
 
   if ((message['content'].toLowerCase().includes('botster') && !message.author.bot) || (randomFuckery === 10))
     {
-      words.shift();
-      if (words[0]) {
-        var startWord = words[Math.floor(Math.random(words.length))];
+      if (words[1]) {
+        var startWord = words[Math.floor(Math.random()*words.length)];
         var phraseLength = (Math.ceil(Math.random()*((words.length + 10)*2)));
       } else {
         var startWord = message.member.displayName;
         var phraseLength = Math.ceil(Math.random()*20);
       }
-    message.channel.send(wordSalad.start(startWord).end(phraseLength).process());
+    var phrase = wordSalad.start(startWord).end(phraseLength).process();
+    var firstLetter = phrase.slice(0, 1);
+    firstLetter = firstLetter.toUpperCase();
+    var restOfPhrase = phrase.slice(1, phrase.length);
+    phrase = firstLetter + restOfPhrase;
+    while (phrase.endsWith('?') || phrase.endsWith('.') || phrase.endsWith('!') || phrase.endsWith('"') || phrase.endsWith(',')) {
+      phrase = phrase.slice(0, -1)
+    }
+    message.channel.send(phrase+'.');
     }
 
 	if (message.guild) {
