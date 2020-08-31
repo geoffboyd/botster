@@ -1,13 +1,13 @@
 {
-  "name": "twitchbot",
-  "version": "0.1.0",
-  "description": "botster for Twitch!",
+  "name": "botster",
+  "version": "0.4.0",
+  "description": "botster bot for Discord, Twitch, and IRC",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "boydster",
+  "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^7.1.0",
     "discord.js": "^12.2.0",
