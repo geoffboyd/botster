@@ -1,3 +1,8 @@
+/*
+  To-Do
+    - Fix crash on DM
+*/
+
 const fs = require('fs');
 const Discord = require('discord.js');
 const { prefix, token, owner } = require('../config/discord.json');
@@ -5,10 +10,7 @@ const SQLite = require("better-sqlite3");
 const sql = new SQLite('../userinputs.sqlite');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-
-// Markov generator
-var MarkovChain = require('markovchain'),
-  wordSalad = new MarkovChain(fs.readFileSync('./discordHistory.txt', 'utf8'))
+var MarkovChain = require('markovchain');
 
 const commandFiles = fs.readdirSync('../discommands').filter(file => file.endsWith('.js'));
 
@@ -35,17 +37,28 @@ client.once('ready', () => {
 });
 
 client.on('message', message => {
+	if (message.channel.type == "dm") {
+		let type = "author"
+	} else {
+		let type = "channel"
+	}
+	if (message.guild !== null && !fs.existsSync(`discord.${message.guild.id}.History.txt`)) {
+		fs.writeFile(`discord.${message.guild.id}.History.txt`, `Welcome to ${message.guild.name}!`, function (err) {
+			if (err) throw err;
+		})
+	}
  	var words = message['content'].trim().split(/ +/);
+        words = words.filter(function(e) { return e.toLowerCase() !== 'botster' });
 	var randomFuckery = Math.ceil(Math.random()*20);
-	if (!message.author.bot) {
-		fs.appendFile('discordHistory.txt', `\n${message['content']}`, function (err) {
+	if (!message.author.bot && message.guild !== null) {
+		fs.appendFile(`discord.${message.guild.id}.History.txt`, `\n${message['content']}`, function (err) {
 			if (err) throw err;
 		});
 	}
 	let score;
 	if (message.author.bot) return;
 
-  if ((message['content'].toLowerCase().includes('botster') && !message.author.bot) || (randomFuckery === 10))
+  if ((!message.author.bot) && (message['content'].toLowerCase().includes('botster')  || (randomFuckery === 10)))
     {
       if (words[1]) {
         var startWord = words[Math.floor(Math.random()*words.length)];
@@ -54,6 +67,7 @@ client.on('message', message => {
         var startWord = message.member.displayName;
         var phraseLength = Math.ceil(Math.random()*20);
       }
+    wordSalad = new MarkovChain(fs.readFileSync(`./discord.${message.guild.id}.History.txt`, 'utf8'))
     var phrase = wordSalad.start(startWord).end(phraseLength).process();
     var firstLetter = phrase.slice(0, 1);
     firstLetter = firstLetter.toUpperCase();

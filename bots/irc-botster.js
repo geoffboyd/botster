@@ -1,4 +1,15 @@
 // IRC botster
+
+/*
+  To Do:
+    8binfo
+    8bremove
+    fcinfo
+    fcremove
+    insultinfo
+    insultremove
+*/
+
 const irc = require('irc');
 const { channels, server, botName, prefix } = require('../config/irc.json');
 const bot = new irc.Client(server, botName, {channels: channels});
@@ -23,18 +34,29 @@ bot.addListener("join", function(channel, who) {
 
 // Listen for messages now
 bot.addListener("message", function(from, to, text, message) {
-  if (from !== 'botster' && from !== 'Susie' && !text.startsWith(prefix)) {
-    fs.appendFile('ircHistory.txt', `\n${text}`, function (err) {
+  if (from !== botName && from !== 'Susie' && !text.startsWith(prefix)) {
+    fs.appendFile('ircNoHHG.txt', `\n${text}`, function (err) {
       if (err) throw err;
     });
   }
   args = text.trim().split(/ +/);
   const channel = message.args[0];
   var randomFuckery = Math.ceil(Math.random()*20);
-  if ((text.toLowerCase().includes('botster') && from !== 'botster' && from !== 'Susie') || (randomFuckery === 10)) {
+  if ((text.toLowerCase().includes(botName.toLowerCase()) && from !== botName && from !== 'Susie') || (randomFuckery === 10)) {
+    var argsLowerCase = args.map(v => v.toLowerCase());
+/*
+    if (argsLowerCase.indexOf(botName.toLowerCase())) {
+      args.splice(argsLowerCase.indexOf(botName), 1);
+    }
+*/
     if (args[1]) {
-      var startWord = args[Math.floor(Math.random()*args.length)];
-      var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+      if (args[1].toLowerCase().includes(botName.toLowerCase())) {
+        var startWord = args[0];
+        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+      } else {
+        var startWord = args[Math.floor(Math.random()*args.length)];
+        var phraseLength = (Math.ceil(Math.random()*((args.length + 10)*2)));
+      }
     } else {
       var startWord = from;
       var phraseLength = Math.ceil(Math.random()*10);
@@ -47,7 +69,8 @@ bot.addListener("message", function(from, to, text, message) {
     while (phrase.endsWith('?') || phrase.endsWith('.') || phrase.endsWith('!') || phrase.endsWith('"') || phrase.endsWith(',')) {
       phrase = phrase.slice(0, -1);
     }
-    bot.say(channel, phrase+'.');
+    const punct = ['.','?','!']
+    bot.say(channel, phrase+punct[Math.floor(Math.random()*punct.length)]);
   } else if (args[0].startsWith(prefix)) {
     args[0] = args[0].slice(1, args[0].length);
     const commandName = args[0].toLowerCase();
@@ -105,10 +128,10 @@ function rollDice (args) {
   return Math.ceil(Math.random() * sides);
 }
 function theSlap(args) {
-  const slaps = [`You slap ${args[0]} around a bit with a large trout`, `You slap ${args[0]} with a large smelly trout`, `You break out the slapping rod and look sternly at ${args[0]}`, `You slap ${args[0]}'s bottom and grin cheekily`, `You slap ${args[0]} a few times`, `You slap ${args[0]} and start getting carried away`, `You would slap ${args[0]}, but you are not being violent today`, `You give ${args[0]} a hearty slap`, `You find the closest large object and give ${args[0]} a slap with it`, `You like slapping people and randomly pick ${args[0]} to slap`, `You dust off a kitchen towel and slap it at ${args[0]}`];
-  if (!args[0]) { 
+  const slaps = [`You slap ${args[1]} around a bit with a large trout`, `You slap ${args[1]} with a large smelly trout`, `You break out the slapping rod and look sternly at ${args[1]}`, `You slap ${args[1]}'s bottom and grin cheekily`, `You slap ${args[1]} a few times`, `You slap ${args[1]} and start getting carried away`, `You would slap ${args[1]}, but you are not being violent today`, `You give ${args[1]} a hearty slap`, `You find the closest large object and give ${args[1]} a slap with it`, `You like slapping people and randomly pick ${args[1]} to slap`, `You dust off a kitchen towel and slap it at ${args[1]}`];
+  if (!args[1]) { 
     return 'You need to tell me who you are slapping';
-  } else if (args[1]) {
+  } else if (args[2]) {
     return "Slow down, pal. Let's slap one person at a time, alright?";
   } else {
       return slaps[Math.ceil(Math.random()*slaps.length)];
@@ -126,10 +149,10 @@ function randSelect (channel, command, type, response, args, from) {
   const rand = rawRand['content'];
   const randID = rawRand['row'];
   if (command === 'insult') {
-    if (args[1]) {
+    if (args[2]) {
       return bot.say(channel, 'Slow down there, pal. We only insult one person at a time around here.');
-    } else if (args[0]) {
-      var target = args[0];
+    } else if (args[1]) {
+      var target = args[1];
     } else {
       var target = from;
     }
