@@ -14,14 +14,13 @@ This bot is began its life as some code stuck together from DiscordJS Guide, Sit
 - AND/OR An IRC channel you want to use
 
 ## Installation Steps (if applicable)
-1. Clone repo && cd into directory
-2. npm install
-3. npm install better-sqlite3
-4. npm install markovchain
-5. Edit json files in ./config to include your own credentials
-6. Edit discommands/secret.json to include your own secret info
-7. Inside ./bots choose which bot to launch using `node`. Example: `node discord-botster.js` to launch the Discord bot.
-8. Interact with your bot via Discord, Twitch, and/or IRC depending on how you are using it.
+1. Clone repo && `cd` into directory
+2. `npm install`
+3. Edit json files in ./config to include your own credentials
+4. Edit discommands/secret.json to include your own secret info
+5. Inside ./bots choose which bot to launch using `node`. Example: `node discord-botster.js` to launch the Discord bot.
+  * Alternatively, you can use something like [PM2](https://pm2.keymetrics.io/) to run the bot in the background and restart it if it ever crashes.
+6. Interact with your bot via Discord, Twitch, and/or IRC depending on how you are using it.
 
 Note in case you choose to get rid of the existing database. You'll want to add a fortune, insult, or 8 ball prediction to generate the table to start collecting those things. The easiest way is just to run the insultadd command, but you can also manually create a sqlite db and import some data into it.
 
