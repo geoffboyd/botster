@@ -26,7 +26,7 @@ Here's what is next on the agenda. Feel free to help check items off or add more
 
 MIT License
 
-Copyright (c) 2019 StuartIanNaylor
+Copyright (c) 2020 Geoff Boyd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
