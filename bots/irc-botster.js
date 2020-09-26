@@ -20,7 +20,7 @@ var args = [];
 // Markov generator
 var MarkovChain = require('markovchain'), 
   fs = require('fs'), 
-  wordSalad = new MarkovChain(fs.readFileSync('./ircNoHHG.txt', 'utf8'))
+  wordSalad = new MarkovChain(fs.readFileSync('./ircHistory.txt', 'utf8'))
 
 var stopAfterSentence = function(sentence) {
   return sentence.split(". ").length > 1
@@ -35,13 +35,14 @@ bot.addListener("join", function(channel, who) {
 // Listen for messages now
 bot.addListener("message", function(from, to, text, message) {
   if (from !== botName && from !== 'Susie' && !text.startsWith(prefix)) {
-    fs.appendFile('ircNoHHG.txt', `\n${text}`, function (err) {
+    fs.appendFile('ircHistory.txt', `\n${text}`, function (err) {
       if (err) throw err;
     });
   }
   args = text.trim().split(/ +/);
+  var markovWords = args.filter(function(e) { return e.toLowerCase() !== botName });
   const channel = message.args[0];
-  var randomFuckery = Math.ceil(Math.random()*20);
+  var randomFuckery = Math.ceil(Math.random()*30);
   if ((text.toLowerCase().includes(botName.toLowerCase()) && from !== botName && from !== 'Susie') || (randomFuckery === 10)) {
     var argsLowerCase = args.map(v => v.toLowerCase());
 /*
@@ -124,7 +125,7 @@ bot.addListener("message", function(from, to, text, message) {
 // Command-related functions
 function rollDice (args) {
   var sides = 6;
-  if (args[0] && Math.abs(args[0]) < 1001) {sides = Math.abs(args[0]);}
+  if (args[1] && Math.abs(args[1]) < 1001) {sides = Math.abs(args[1]);}
   return Math.ceil(Math.random() * sides);
 }
 function theSlap(args) {

@@ -1,4 +1,5 @@
 const tmi = require('tmi.js');
+const discord = require('discord.js');
 const fs =  require('fs');
 const SQLite = require("better-sqlite3");
 const db = new SQLite('../userinputs.sqlite');
@@ -25,7 +26,6 @@ client.on('connected', onConnectedHandler);
 
 // Connect to Twitch:
 client.connect();
-
 // Called every time a message comes in
 function onMessageHandler (target, context, msg, self) {
   var randomFuckery = Math.ceil(Math.random()*20);
@@ -43,6 +43,7 @@ function onMessageHandler (target, context, msg, self) {
       if (err) throw err;
     });
   }
+  // Sometimes random fun happens
   if (randomFuckery == 10 || msg.toLowerCase().includes('botster')) {
     if (words[1]) {
       var startWord = words[Math.floor(Math.random()*words.length)];
@@ -60,12 +61,26 @@ function onMessageHandler (target, context, msg, self) {
       phrase.slice(0, -1)
     }
     client.say(target, phrase+'.');
-  } // Sometimes random fun happens
+  } 
 
   // Now do some stuff!
   switch (commandName) {
+    case 'discord':
+      getLink(target);
+      break;
+
+    case 'updatelink':
+      if (from !== "nunclejrod" && from !== "the_boydster"){
+        client.say(target, "You can't do that.");
+      } else if (!args[0] || args[1] || (args[0] && !args[0].startsWith('http'))) {
+        client.say(target, `Command usage: ${prefix}updatelink https://new.invite/link`); 
+      } else {
+        updateLink(target, args[0]);
+      }
+      break;
+
     case 'commands':
-      client.say(target, `${prefix}dice, ${prefix}8b, ${prefix}8badd, ${prefix}insult, ${prefix}insultadd, ${prefix}fortune, ${prefix}fcadd, ${prefix}slap`);
+      client.say(target, `${prefix}discord, ${prefix}dice, ${prefix}8b, ${prefix}8badd, ${prefix}insult, ${prefix}insultadd, ${prefix}fortune, ${prefix}fcadd, ${prefix}slap, ${prefix}colorchange`);
       break;
 
     case 'colorchange':
@@ -109,7 +124,7 @@ function onMessageHandler (target, context, msg, self) {
     case 'insultadd':
       randAdd(target, msg, 'insult', from, 'insult');
       break;
-    
+
   }
 };
 
@@ -192,6 +207,20 @@ function textColor(args) {
   } else {
     return `/color ${args[0]}`;
   }
+}
+
+function getLink(target){
+  fs.readFile('../config/discordlink.txt', (err, data) => {
+    if (err) throw err;
+    return client.say(target, data.toString());
+  });
+}
+
+function updateLink(target, newLink){
+  fs.writeFile('../config/discordlink.txt', newLink, (err) => {
+    if (err) throw err;
+    return client.say(target, 'Updated!');
+  });
 }
 
 // Called every time the bot connects to Twitch chat 
